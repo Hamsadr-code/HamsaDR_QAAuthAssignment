@@ -26,157 +26,33 @@ public class RegistrationTests {
 
     @BeforeMethod
     public void setUp() {
-
-        // Load configuration
         ConfigReader.loadProperties();
-
-        // Launch Chrome
         driver = new ChromeDriver();
-
         driver.manage().window().maximize();
-
-        driver.manage().timeouts()
-                .implicitlyWait(Duration.ofSeconds(5));
-
-        // Initialize Page Objects
-        registrationPage =
-                new RegistrationPage(driver);
-
-        loginPage =
-                new LoginPage(driver);
-
-        // Get password from configuration
-        testPassword =
-                ConfigReader.get("test.password");
-
-        // Generate a unique email
-        testEmail =
-                "hamsa.qa"
-                + System.currentTimeMillis()
-                + "@example.com";
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        registrationPage = new RegistrationPage(driver);
+        loginPage = new LoginPage(driver);
+        testPassword = ConfigReader.get("test.password");
+        testEmail = "hamsa.qa" + System.currentTimeMillis() + "@example.com";
     }
-
-    // ============================================================
-    // REG-001
-    // Complete Registration → Login → Logout → Duplicate Email
-    // ============================================================
-
     @Test
     public void testCompleteRegistrationLoginAndDuplicateFlow() {
-
-        // --------------------------------------------------------
-        // STEP 1: Open Demo Web Shop Registration Page
-        // --------------------------------------------------------
-
-        driver.get(
-                ConfigReader.get("register.url")
-        );
-
-        // --------------------------------------------------------
-        // STEP 2: Register a New User
-        // --------------------------------------------------------
-
-        registrationPage.register(
-                ConfigReader.get("test.gender"),
-                ConfigReader.get("test.firstName"),
-                ConfigReader.get("test.lastName"),
-                testEmail,
-                testPassword
-        );
-
-        // --------------------------------------------------------
-        // STEP 3: Verify Registration Was Successful
-        // --------------------------------------------------------
-
-        Assert.assertTrue(
-                registrationPage.isRegistrationSuccessful(),
-                "User registration was not successful"
-        );
-
-        ScreenshotUtil.captureScreenshot(
-                driver,
-                "01_Successful_Registration"
-        );
-
-        // --------------------------------------------------------
-        // STEP 4: Open Login Page
-        // --------------------------------------------------------
-
-        driver.get(
-                ConfigReader.get("login.url")
-        );
-
-        // --------------------------------------------------------
-        // STEP 5: Login Using Newly Registered Credentials
-        // --------------------------------------------------------
-
-        loginPage.login(
-                testEmail,
-                testPassword
-        );
-
-        // --------------------------------------------------------
-        // STEP 6: Verify Successful Login
-        // --------------------------------------------------------
-
-        Assert.assertTrue(
-                loginPage.isLoggedIn(),
-                "User could not login with registered credentials"
-        );
-
-        ScreenshotUtil.captureScreenshot(
-                driver,
-                "02_Successful_Login"
-        );
-
-        // --------------------------------------------------------
-        // STEP 7: Logout
-        // --------------------------------------------------------
-
+        driver.get(ConfigReader.get("register.url"));
+        registrationPage.register(ConfigReader.get("test.gender"),ConfigReader.get("test.firstName"),ConfigReader.get("test.lastName"),testEmail,testPassword);
+        Assert.assertTrue(registrationPage.isRegistrationSuccessful(),"User registration was not successful");
+        ScreenshotUtil.captureScreenshot(driver,"01_Successful_Registration");
+        driver.get(ConfigReader.get("login.url"));
+        loginPage.login(testEmail,testPassword);
+        Assert.assertTrue(loginPage.isLoggedIn(),"User could not login with registered credentials");
+        ScreenshotUtil.captureScreenshot(driver,"02_Successful_Login");
         loginPage.clickLogout();
-
-        // --------------------------------------------------------
-        // STEP 8: Open Registration Page Again
-        // --------------------------------------------------------
-
-        driver.get(
-                ConfigReader.get("register.url")
-        );
-
-        // --------------------------------------------------------
-        // STEP 9: Try Registering With SAME EMAIL
-        // --------------------------------------------------------
-
-        registrationPage.register(
-                ConfigReader.get("test.gender"),
-                ConfigReader.get("test.firstName"),
-                ConfigReader.get("test.lastName"),
-                testEmail,
-                testPassword
-        );
-
-        // --------------------------------------------------------
-        // STEP 10: Verify Duplicate Email Validation
-        // --------------------------------------------------------
-
-        Assert.assertTrue(
-                registrationPage.isValidationMessageDisplayed(),
-                "Duplicate email validation was not displayed"
-        );
-
-        ScreenshotUtil.captureScreenshot(
-                driver,
-                "03_Duplicate_Email"
-        );
+        driver.get(ConfigReader.get("register.url"));
+        registrationPage.register(ConfigReader.get("test.gender"),ConfigReader.get("test.firstName"),ConfigReader.get("test.lastName"),testEmail,testPassword);
+        Assert.assertTrue( registrationPage.isValidationMessageDisplayed(),"Duplicate email validation was not displayed");
+        ScreenshotUtil.captureScreenshot(driver,"03_Duplicate_Email");
     }
-
-    // ============================================================
-    // CLEANUP
-    // ============================================================
-
     @AfterMethod
     public void tearDown() {
-
         if (driver != null) {
             driver.quit();
         }
