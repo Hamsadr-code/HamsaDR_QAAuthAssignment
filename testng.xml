@@ -1,0 +1,9 @@
+<suite name="Suite">
+  <test thread-count="5" name="Test">
+    <classes>
+      <class name="tests.RegistrationTests"/>
+      <class name="tests.LoginTests"/>
+      <class name="tests.DashboardSecurityTests"/>
+    </classes>
+  </test> <!-- Test -->
+</suite> <!-- Suite -->
